@@ -1,0 +1,16 @@
+{
+    "dllName": "\"user32.dll\"\n",
+    "dllCategory": "SystemDLL"
+}{
+    "dllName": "\"KERNEL32.dll\"\n",
+    "dllCategory": "SystemDLL"
+}{
+    "dllName": "\"kernel32.dll\"\n",
+    "dllCategory": "SystemDLL"
+}{
+    "dllName": "\"Lab12-01.dll\"\n",
+    "dllCategory": "CustomDLL"
+}{
+    "dllName": "\"psapi.dll\"\n",
+    "dllCategory": "SystemDLL"
+}
