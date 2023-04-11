@@ -40,8 +40,3 @@ def findDLLStrings():
           list_dll["dllCategory"] = "CustomDLL"  # then it is a custom DLL
           print(list_dll)
           f2.write(json.dumps(list_dll))
-
-  
-           
-  # # # # this JSON file should be looped and whichever belong to the custom DLL, function checks needs to be done!
-  
