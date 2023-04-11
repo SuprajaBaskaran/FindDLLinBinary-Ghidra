@@ -1,7 +1,0 @@
-KerbClientShared.dll
-kerberos.dll
-kernel.appcore.dll
-kernel32.dll
-KernelBase.dll
-KeyCredMgr.dll
-keyiso.dll
