@@ -1,9 +1,9 @@
-# This is a sample Python script.
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+import json
 from ordered_set import OrderedSet
+from findDLL import *
 
+#from Practical malware Chapter 12 : DLL Injection
 call_list ={
     "createtoolhelp32snapshot": [0.5, 0],
     "process32first": [0.5, 1],
@@ -16,7 +16,27 @@ call_list ={
     "createremotethread": [1.0, 8]
 }
 binary_strings = []
+dll_strings = []
 thresh_hold = .4
+
+
+def load_dlls():
+    data = ''
+    with open('tempfile.json', 'r') as f:
+        for line in f:
+            data+=line
+    #print(data)
+    data1 = data.split('}')
+    for d in data1:
+        if len(d) >= 2:
+            name, category = d.split(',')
+            if 'CustomDLL' in category:
+                dll_strings.append(name.split(':')[1])
+    print(dll_strings)
+    #print(data1)
+    #file = open('dll_names.json')
+    #data = file(file)
+    #print(data)
 
 
 def load_strings():
@@ -91,9 +111,11 @@ def pattern_match(result):
 
 
 if __name__ == '__main__':
+    findDLLStrings()
     load_strings()
     result = search_calls()
-    if is_suspicious(result) and pattern_match(result):
+    load_dlls()
+    if is_suspicious(result) and pattern_match(result) and len(dll_strings) > 0:
         print('Warning: Your Binary Might Cause Potential DLL Injection')
     else:
         print('found nothing')
