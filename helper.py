@@ -2,7 +2,7 @@
 import json
 from ordered_set import OrderedSet
 from findDLL import *
-
+#from PyQt5 import QtCore, QtGui, QtWidgets, uic
 #from Practical malware Chapter 12 : DLL Injection
 call_list ={
     "createtoolhelp32snapshot": [0.5, 0],
@@ -16,11 +16,13 @@ call_list ={
     "createremotethread": [1.0, 8]
 }
 binary_strings = []
-dll_strings = []
+custom_dlls = []
+system_dlls = []
 thresh_hold = .4
 
 
 def load_dlls():
+    #loads all the system dlls and custom dlls in two seperate lists
     data = ''
     with open('tempfile.json', 'r') as f:
         for line in f:
@@ -31,8 +33,21 @@ def load_dlls():
         if len(d) >= 2:
             name, category = d.split(',')
             if 'CustomDLL' in category:
-                dll_strings.append(name.split(':')[1])
-    print(dll_strings)
+                xx = name.split(':')[1].split('.')[0]+'.dll'
+                yy = xx.split('\"')
+                for y in yy:
+                    if 'dll' in y:
+                        custom_dlls.append(y)
+            else:
+                xx = name.split(':')[1].split('.')[0] + '.dll'
+                yy = xx.split('\"')
+                for y in yy:
+                    if 'dll' in y:
+                        system_dlls.append(y)
+
+
+    print(custom_dlls)
+    print(system_dlls)
     #print(data1)
     #file = open('dll_names.json')
     #data = file(file)
@@ -40,6 +55,7 @@ def load_dlls():
 
 
 def load_strings():
+    ## loads all the strings in a list
     with open("strings.txt") as file:
         for item in file:
             binary_strings.append(str(item))
@@ -47,6 +63,7 @@ def load_strings():
 
 
 def search_calls():
+    ##search for all the function calls that match the call list
     result = []
     for string in binary_strings:
         for i, (k,v) in enumerate(call_list.items()):
@@ -58,6 +75,8 @@ def search_calls():
 
 
 def is_suspicious(result):
+    ##flag suspicious if the weighted average of the function calls found crosses a certain threshold
+    ##Future work: Find tune this threshold with more malicious binaries, possibly leverage ML
     sum = 0.0
     for res in result:
         sum = sum + call_list[res][0]
@@ -71,6 +90,7 @@ def is_suspicious(result):
 
 
 def is_sorted_ascending(lst):
+    ##checks if a list is sorted in ascending order
     for i in range(1, len(lst)):
         if lst[i] < lst[i - 1]:
             return False
@@ -78,6 +98,7 @@ def is_sorted_ascending(lst):
 
 
 def is_sorted_descending(lst):
+    #checks if a list is sorted in descending order
     for i in range(1,len(lst)):
         if lst[i] > lst[i-1]:
             return False
@@ -85,6 +106,7 @@ def is_sorted_descending(lst):
 
 
 def max_sorted_sublist(lst):
+    #returns length of maximum sorted sublist (ascending or descending order)
     tmp = [[]]
     max_len = 0
     for i in range(len(lst) + 1):
@@ -106,17 +128,9 @@ def pattern_match(result):
     for item in result:
         pattern.append(call_list[item][1])
     print(pattern)
+    #if the function list contains a sorted sublist (ascending or descending) order and its length is more than three meaning atleast
+    #three function calls are present in the pattern we mark it as suspicious
     len = max_sorted_sublist(pattern)
     return len >= 3
 
-
-if __name__ == '__main__':
-    findDLLStrings()
-    load_strings()
-    result = search_calls()
-    load_dlls()
-    if is_suspicious(result) and pattern_match(result) and len(dll_strings) > 0:
-        print('Warning: Your Binary Might Cause Potential DLL Injection')
-    else:
-        print('found nothing')
 
